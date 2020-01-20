@@ -3,6 +3,7 @@
 
 namespace Stars\Tools\Contracts;
 
+
 /**
  * App 补丁包
  *
@@ -10,7 +11,7 @@ namespace Stars\Tools\Contracts;
  * @package Stars\Tools\Contracts
  */
 
-interface AppPatch
+interface IAppPatch
 {
 
 }
