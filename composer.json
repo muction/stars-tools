@@ -1,0 +1,11 @@
+{
+    "name": "laravel-stars/tools",
+    "description": "tools",
+    "authors": [
+        {
+            "name": "muction",
+            "email": "muction@yeah.net"
+        }
+    ],
+    "require": {}
+}
