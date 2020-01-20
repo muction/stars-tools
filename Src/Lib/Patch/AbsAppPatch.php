@@ -33,4 +33,14 @@ abstract class AbsAppPatch implements AppPatch
      */
     abstract function getWorkDir();
 
+    /**
+     * 生成补丁文件名，不包含扩展名
+     * @return mixed
+     */
+    function makePatchFileName(){
+
+        return 'PATCH.'.date('Ymd.Hi');
+    }
+
+
 }
