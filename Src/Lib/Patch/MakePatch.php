@@ -19,11 +19,24 @@ class MakePatch extends AbsAppPatch
         $this->setWorkDir( $makePatchOption->getWorkDir() );
         $this->setHandleFile( $makePatchOption->getFiles() );
         $this->setHasReadMeFile( $hasReadMeFile ) ;
-
+        $this->setSavePatchDir( $makePatchOption->getSavePatchDir() );
         if( $makePatchOption->getHandleType() == self::HANDLE_TYPE_GIT){
+            $this->setGitDir( $makePatchOption->getGitDir() );
             $this->setMakeGitFiles();
         }
-        return $this->zipFiles();
+    }
+
+    /**
+     * 开始制作
+     * @return bool
+     * @throws \Exception
+     */
+    public function handle(){
+        try {
+            return $this->zipFiles();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
     /**
@@ -36,27 +49,28 @@ class MakePatch extends AbsAppPatch
         try{
 
             $patchFileName = $this->makePatchFileName( ) ;
-            $patchPathFileName = $this->getWorkDir() . $patchFileName ;
-
+            $patchPathFileName = $this->getSavePatchDir() . $patchFileName ;
             foreach ($this->getHandleFile() as $file){
-                if( !file_exists( $file ) ){
+                if( !file_exists( $this->getWorkDir(). $file ) ){
                     throw new \Exception("文件不存在: {$file}");
                 }
             }
 
             $zipFiles = implode(" ",  $this->getHandleFile() );
+            if(!$zipFiles){
 
+            }
             exec("zip {$patchPathFileName} {$zipFiles}");
 
             if(!file_exists($patchPathFileName) ){
-                throw new \Exception("打包失败");
+                throw new \Exception("打包失败: {$patchPathFileName}");
             }
             //计算补丁md5
             $fileMd5= md5_file( $patchPathFileName );
             $newPatchFileName = $patchFileName .'-'.$fileMd5.'.zip' ;
 
             //重新命名文件
-            $newPatchPathFileName= $patchPathFileName . $newPatchFileName ;
+            $newPatchPathFileName= $this->getSavePatchDir() . $newPatchFileName ;
             if( rename(  $patchPathFileName , $newPatchPathFileName )) {
                 return $newPatchFileName;
             }
@@ -69,37 +83,29 @@ class MakePatch extends AbsAppPatch
     }
 
     /**
-     *
+     * @return bool
      */
     private function setMakeGitFiles(){
         try{
-            $commitIds = "";
-            while ( !$commitIds ){
-                $input = $this->ask("请输入git提交ID，多个用空格：");
-                if($input){
-                    $commitIds = $input;
-                }
-            }
-
             $files = [];
-            $commitIds = explode(" ",  $this->getHandleFile());
+            $commitIds = $this->getHandleFile();
             foreach ($commitIds as $commitId ){
-                exec("git -C ".$this->gitRepoDir ." show {$commitId} --name-only", $outPut );
+                $command = "git -C ".$this->getGitDir() ." show {$commitId} --name-only";
+                exec($command, $outPut );
                 if( $outPut ){
                     $outPut = array_reverse($outPut );
                     foreach ($outPut as $line){
-                        if( file_exists( base_path($line) ) ){
+                        if( file_exists( $this->getWorkDir() . $line ) && $line && !in_array($line , $files)){
                             $files[] = $line;
                         }
                     }
                 }
             }
+
             $this->setHandleFile( $files );
-            $this->zipFiles( $files );
 
         }catch (\Exception $exception){
-
-            $this->error("获取GIT提交时异常：".$exception->getMessage() );
+            return false;
         }
     }
 

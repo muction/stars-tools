@@ -25,6 +25,12 @@ abstract class AbsAppPatch implements IAppPatch
     private $workDir = "";
 
     /**
+     * GIT仓库目录
+     * @var string
+     */
+    private $gitDir = "";
+
+    /**
      * 要处理的文件
      * @var null
      */
@@ -36,6 +42,11 @@ abstract class AbsAppPatch implements IAppPatch
      */
     private $hasReadMeFile = null;
 
+    /**
+     * 保存补丁的dir
+     * @var string
+     */
+    private $savePatchDir = "";
 
     abstract function __construct( IAppMakePatchOption $makePatchOption , bool $hasReadMeFile = true  ) ;
 
@@ -88,6 +99,41 @@ abstract class AbsAppPatch implements IAppPatch
      */
     protected function getHasReadMeFile(){
         return $this->hasReadMeFile ;
+    }
+
+    /**
+     * 设置git仓库本路径
+     * @param $gitDir
+     * @return mixed
+     */
+    protected function setGitDir( $gitDir ){
+
+        return $this->gitDir = $gitDir ;
+    }
+
+    /**
+     * 获取git仓库本地路径
+     * @return string
+     */
+    protected function getGitDir(){
+        return $this->gitDir;
+    }
+
+    /**
+     * 设置补丁DIr
+     * @param $savePatchDir
+     * @return mixed
+     */
+    protected function setSavePatchDir( $savePatchDir ){
+        return $this->savePatchDir =$savePatchDir;
+    }
+
+    /**
+     * 获取补丁DIR
+     * @return string
+     */
+    protected function getSavePatchDir(){
+        return $this->savePatchDir;
     }
 
     /**
