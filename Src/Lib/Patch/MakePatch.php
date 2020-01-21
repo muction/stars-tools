@@ -73,7 +73,7 @@ class MakePatch extends AbsAppPatch
 
             //计算补丁md5
             $fileMd5= md5_file( $patchPathFileName );
-            $newPatchFileName = $patchFileName .'-'.$fileMd5.'.zip' ;
+            $newPatchFileName = $patchFileName .'.'.$fileMd5  ;
 
             //重新命名文件
             $newPatchPathFileName= $this->getSavePatchDir() . $newPatchFileName ;
@@ -117,19 +117,14 @@ class MakePatch extends AbsAppPatch
 
     /**
      * 在work目录生存readme 文件到压缩包
-     * @param null $lineTitle
      * @return string
      */
-    private function makeReadMeFile( $lineTitle= null ){
+    private function makeReadMeFile(){
 
         if( !file_exists( $this->getReadMePathFile() ) ){
             touch( $this->getReadMePathFile() );
         }
-
-        if($lineTitle !=null){
-            file_put_contents( $this->getReadMePathFile() , "{$lineTitle} \r\n");
-        }
-
+        file_put_contents( $this->getReadMePathFile() , "" );
         foreach ($this->getHandleFile()  as $file){
             file_put_contents( $this->getReadMePathFile() , "{$file} \r\n" , FILE_APPEND );
         }
@@ -137,13 +132,17 @@ class MakePatch extends AbsAppPatch
     }
 
     /**
-     *
+     * 获取readme 路径
      * @return string
      */
     private function getReadMePathFile(){
         return $this->getWorkDir(). $this->getReadMeFileName();
     }
 
+    /**
+     * readme文件
+     * @return string
+     */
     private function getReadMeFileName(){
         return 'readme.txt';
     }
