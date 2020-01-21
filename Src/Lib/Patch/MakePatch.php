@@ -58,13 +58,19 @@ class MakePatch extends AbsAppPatch
 
             $zipFiles = implode(" ",  $this->getHandleFile() );
             if(!$zipFiles){
-
+                throw new \Exception("没有找到有效文件进行打包");
             }
+
+            if( $this->getHasReadMeFile() ){
+                $zipFiles .= $this->makeReadMeFile() ;
+            }
+
             exec("zip {$patchPathFileName} {$zipFiles}");
 
             if(!file_exists($patchPathFileName) ){
                 throw new \Exception("打包失败: {$patchPathFileName}");
             }
+
             //计算补丁md5
             $fileMd5= md5_file( $patchPathFileName );
             $newPatchFileName = $patchFileName .'-'.$fileMd5.'.zip' ;
@@ -111,18 +117,23 @@ class MakePatch extends AbsAppPatch
 
     /**
      * 在work目录生存readme 文件到压缩包
+     * @param null $lineTitle
+     * @return string
      */
-    private function makeReadMeFile(){
+    private function makeReadMeFile( $lineTitle= null ){
 
         if( !file_exists( $this->getReadMePathFile() ) ){
             touch( $this->getReadMePathFile() );
         }
 
-        if( file_put_contents( $this->getReadMePathFile() , "本次补丁包文件列表 \r\n") ){
-            return $this->getReadMePathFile() ;
+        if($lineTitle !=null){
+            file_put_contents( $this->getReadMePathFile() , "{$lineTitle} \r\n");
         }
 
-        return false;
+        foreach ($this->getHandleFile()  as $file){
+            file_put_contents( $this->getReadMePathFile() , "{$file} \r\n" , FILE_APPEND );
+        }
+        return ' '.$this->getReadMeFileName() ;
     }
 
     /**
@@ -130,7 +141,10 @@ class MakePatch extends AbsAppPatch
      * @return string
      */
     private function getReadMePathFile(){
-        return $this->getWorkDir().'readme.txt';
+        return $this->getWorkDir(). $this->getReadMeFileName();
     }
 
+    private function getReadMeFileName(){
+        return 'readme.txt';
+    }
 }
