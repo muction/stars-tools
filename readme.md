@@ -6,20 +6,21 @@
 
 **快速使用**
 
-``` 
+```php  
   use Stars\Tools\Foundation\Translate;
-  use Stars\Tools\Foundation\Lib\Translate\BaiDuTranslate;
+  use Stars\Tools\Lib\Translate\BaiDuTranslate;
 
   $translate = new Translate(
        new BaiDuTranslate( 'AppId' , 'Scecet'  )
    ); 
   $translate->setContent("要翻译的内容);
-  $result = $translate->result();   
+  $result = $translate->result();
+
 ```
 
 **返回结果**
 
-``` 
+```php  
   [
     ['src'=> '原文' ,'dst'=>'译文']
   ] 
@@ -50,3 +51,14 @@
 ```
 
 
+##### 三、 Peace 系统搜索器
+
+```php
+   use Stars\Tools\Foundation\SearchPeace;
+
+   $search = new SearchPeace();
+   $search->setKeyWord( "你好" );
+   $search->addSearchMenuBindConfig( 12 , [ 'title','summary'] , ['id','title' ,'summary' ,'bind_id'] );
+   $search->addSearchMenuBindConfig( 13 , [ 'title','summary'] , ['id','title' ,'summary' ,'bind_id'] );
+   $datas = $search->paginate(1) ;
+```
