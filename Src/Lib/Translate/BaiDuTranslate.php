@@ -1,7 +1,6 @@
 <?php
 namespace Stars\Tools\Lib\Translate;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 use Stars\Tools\Contracts\ITranslate;
 
 /**
@@ -84,8 +83,12 @@ class BaiDuTranslate implements ITranslate
     public function result()
     {
         //开始翻译
-        $result = $this->handleTranslate() ;
-        return isset($result['trans_result']) ? $result['trans_result'] : "";
+        if($this->handleTranslate()){
+            $response = json_decode( $this->responseContent , true );
+            return isset($response['trans_result']) ? $response['trans_result'] : null;
+        } ;
+
+        return null;
     }
 
     /**
@@ -109,7 +112,8 @@ class BaiDuTranslate implements ITranslate
         ] ;
         $response = $httpClient->post( $this->apiUrl , $params);
         if($response->getStatusCode() == 200 ){
-            return json_decode($response->getBody()->getContents() , true );
+            $this->responseContent = $response->getBody()->getContents() ;
+            return true;
         }
 
         return false;
